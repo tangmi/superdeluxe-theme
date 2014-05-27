@@ -1,3 +1,4 @@
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,400italic,600italic|Source+Code+Pro:400,700|Merriweather:400,700,400italic,700italic);
 
 //
 // Load core variables and mixins
@@ -6,7 +7,74 @@
 @import "variables.less";
 @import "mixins.less";
 
+//
+// Scaffolding
+// --------------------------------------------------
 
+a {
+  color: @link-color;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    color: @link-hover-color;
+  }
+}
+
+p a {
+  border-bottom: 1px solid @gray-light;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background-color: white;
+  }
+}
+
+//
+// Fonts / Type
+// --------------------------------------------------
+code,
+kbd,
+pre,
+samp {
+  font-family: @font-family-monospace;
+}
+body {
+  font-family: @font-family-base;
+
+  background-color: #eee;
+}
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: @headings-font-family;
+}
+
+p {
+  color: #4d4d4d;
+}
+
+//
+// Code
+// --------------------------------------------------
+code {
+  color: @code-color;
+  background-color: @pre-bg;
+  border-radius: 0;
+}
+
+kbd {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: @kbd-color;
+  background-color: @kbd-bg;
+  border-radius: @border-radius-small;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+}
+
+pre {
+  border-radius: 0;
+}
 
 //
 // Buttons
@@ -21,32 +89,29 @@
 .btn-danger {
   text-shadow: 0 -1px 0 rgba(0,0,0,.2);
   @shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
-  .box-shadow(@shadow);
-
-  // Reset the shadow
-  &:active,
-  &.active {
-    .box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
-  }
+  // .box-shadow(@shadow);
+  .box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 0 rgba(255, 255, 255, 0.3));
 }
 
 // Mixin for generating new styles
 .btn-styles(@btn-color: #555) {
-  #gradient > .vertical(@start-color: @btn-color; @end-color: darken(@btn-color, 12%));
+  #gradient > .vertical(@start-color: @btn-color; @end-color: darken(@btn-color, 2%));
   .reset-filter(); // Disable gradients for IE9 because filter bleeds through rounded corners
   background-repeat: repeat-x;
-  border-color: darken(@btn-color, 14%);
+  border-color: darken(@btn-color, 20%);
 
   &:hover,
-  &:focus  {
-    background-color: darken(@btn-color, 12%);
-    background-position: 0 -15px;
+  &:focus {
+    background-image: none;
+    background-color: lighten(@btn-color, 5%);
+    // .box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.1));
   }
 
   &:active,
-  &.active {
-    background-color: darken(@btn-color, 12%);
-    border-color: darken(@btn-color, 14%);
+  &.active,
+  .open > .dropdown-toggle& {
+    .box-shadow(inset 0 4px 8px -3px rgba(0,0,0,.5));
+    background-color: @btn-color;
   }
 }
 
@@ -55,18 +120,32 @@
   // Remove the gradient for the pressed/active state
   &:active,
   &.active {
-    background-image: none;
+    // background-image: none;
   }
+  border-radius: @border-radius-base;
 }
 
 // Apply the mixin to the buttons
-.btn-default { .btn-styles(@btn-default-bg); text-shadow: 0 1px 0 #fff; border-color: #ccc; }
+.btn-default { .btn-styles(@btn-default-bg); }
 .btn-primary { .btn-styles(@btn-primary-bg); }
 .btn-success { .btn-styles(@btn-success-bg); }
 .btn-info    { .btn-styles(@btn-info-bg); }
 .btn-warning { .btn-styles(@btn-warning-bg); }
 .btn-danger  { .btn-styles(@btn-danger-bg); }
 
+.btn-group-vertical > .btn {
+  &:not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
+  &:first-child:not(:last-child) {
+    border-top-right-radius: @border-radius-base;
+    .border-bottom-radius(0);
+  }
+  &:last-child:not(:first-child) {
+    border-bottom-left-radius: @border-radius-base;
+    .border-top-radius(0);
+  }
+}
 
 
 //
@@ -75,7 +154,7 @@
 
 .thumbnail,
 .img-thumbnail {
-  .box-shadow(0 1px 2px rgba(0,0,0,.075));
+  // .box-shadow(0 1px 2px rgba(0,0,0,.075));
 }
 
 
@@ -84,16 +163,94 @@
 // Dropdowns
 // --------------------------------------------------
 
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
-  #gradient > .vertical(@start-color: @dropdown-link-hover-bg; @end-color: darken(@dropdown-link-hover-bg, 5%));
-  background-color: darken(@dropdown-link-hover-bg, 5%);
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: @zindex-dropdown;
+  display: none; // none by default, but block on "open" of the menu
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0; // override default ul
+  list-style: none;
+  font-size: @font-size-base;
+  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  background-color: @dropdown-bg;
+  border: 1px solid @dropdown-fallback-border; // IE8 fallback
+  border: 1px solid @dropdown-border;
+  border-radius: @border-radius-base;
+  .box-shadow(0 6px 12px rgba(0,0,0,.1));
+  background-clip: padding-box;
+
+  // Aligns the dropdown menu to right
+  //
+  // Deprecated as of 3.1.0 in favor of `.dropdown-menu-[dir]`
+  &.pull-right {
+    right: 0;
+    left: auto;
+  }
+
+  // Dividers (basically an hr) within the dropdown
+  .divider {
+    .nav-divider(@dropdown-divider-bg);
+  }
+
+  // Links within the dropdown menu
+  > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: @line-height-base;
+    color: @dropdown-link-color;
+    white-space: nowrap; // prevent links from randomly breaking onto new lines
+  }
 }
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
-  #gradient > .vertical(@start-color: @dropdown-link-active-bg; @end-color: darken(@dropdown-link-active-bg, 5%));
-  background-color: darken(@dropdown-link-active-bg, 5%);
+
+// Hover/Focus state
+.dropdown-menu > li > a {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: @dropdown-link-hover-color;
+    background-color: @dropdown-link-hover-bg;
+  }
+}
+
+// Active state
+.dropdown-menu > .active > a {
+  &,
+  &:hover,
+  &:focus {
+    color: @dropdown-link-active-color;
+    text-decoration: none;
+    outline: 0;
+    background-color: @dropdown-link-active-bg;
+  }
+}
+
+// Disabled state
+//
+// Gray out text and ensure the hover/focus state remains gray
+
+.dropdown-menu > .disabled > a {
+  &,
+  &:hover,
+  &:focus {
+    color: @dropdown-link-disabled-color;
+  }
+}
+// Nuke hover/focus effects
+.dropdown-menu > .disabled > a {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background-color: transparent;
+    background-image: none; // Remove CSS gradient
+    .reset-filter();
+    cursor: not-allowed;
+  }
 }
 
 

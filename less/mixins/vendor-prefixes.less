@@ -70,6 +70,11 @@
           box-shadow: @shadow;
 }
 
+.box-shadow(@shadow1, @shadow2) {
+  -webkit-box-shadow: @shadow1, @shadow2; // iOS <4.3 & Android <4.1
+          box-shadow: @shadow1, @shadow2;
+}
+
 // Box sizing
 .box-sizing(@boxmodel) {
   -webkit-box-sizing: @boxmodel;
