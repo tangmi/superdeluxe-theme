@@ -1,0 +1,14 @@
+{
+  "name": "tang-theme",
+  "version": "0.0.0",
+  "description": "a theme for tang",
+  "private": true,
+  "dependencies": {
+    "gulp": "^3.6.2",
+    "gulp-less": "^1.2.3",
+    "gulp-minify-css": "^0.3.4",
+    "gulp-rename": "^1.2.0",
+    "gulp-clean": "^0.3.0",
+    "gulp-util": "^2.2.14"
+  }
+}
